@@ -1,45 +1,109 @@
 #!/bin/bash
-mkdir /etc/usuarios 1>/dev/null 2>/dev/null
-userrc=$(echo $1 |sed 's/-/k/g' |sed 's/0/a/g' |sed 's/1/b/g' |sed 's/2/c/g' |sed 's/3/d/g' |sed 's/4/e/g' |sed 's/5/f/g' |sed 's/6/g/g' |sed 's/7/h/g' |sed 's/8/i/g' |sed 's/9/j/g')
-sustenido=$
-limpcron=$(cat /etc/crontab |grep -v /$1.sh)
-echo "$limpcron" > /etc/crontab
-echo "#!/bin/bash" > /etc/usuarios/$1.sh
-echo ""$userrc"t="$sustenido"(ps -u $1 |grep 'sshd' |wc -l)" >> /etc/usuarios/$1.sh
-echo "if [ "$sustenido""$userrc"t -gt $2 ]" >> /etc/usuarios/$1.sh
-echo "then" >> /etc/usuarios/$1.sh
-echo $userrc"pidi="$sustenido"(ps -u $1 |grep sshd |awk {'print "$sustenido"1'})" >> /etc/usuarios/$1.sh
-echo 'echo "'$sustenido''$userrc''pidi'" > /etc/usuarios/pid'$userrc >> /etc/usuarios/$1.sh
-echo $userrc"pid="$sustenido"(cat -n /etc/usuarios/pid$userrc |awk ' "$sustenido"1 > $2 { print "$sustenido"NF }')" >> /etc/usuarios/$1.sh
-echo "kill -9 $sustenido"$userrc"pid" >> /etc/usuarios/$1.sh
-echo "fi" >> /etc/usuarios/$1.sh
-mkdir /etc/tempo 1>/dev/null 2>/dev/null
-echo "#!/bin/bash" > /etc/tempo/$1.sh
-echo "bash /etc/usuarios/"$1".sh" >> /etc/tempo/$1.sh
-echo "sleep 5s" >> /etc/tempo/$1.sh
-echo "bash /etc/usuarios/"$1".sh" >> /etc/tempo/$1.sh
-echo "sleep 5s" >> /etc/tempo/$1.sh
-echo "bash /etc/usuarios/"$1".sh" >> /etc/tempo/$1.sh
-echo "sleep 5s" >> /etc/tempo/$1.sh
-echo "bash /etc/usuarios/"$1".sh" >> /etc/tempo/$1.sh
-echo "sleep 5s" >> /etc/tempo/$1.sh
-echo "bash /etc/usuarios/"$1".sh" >> /etc/tempo/$1.sh
-echo "sleep 5s" >> /etc/tempo/$1.sh
-echo "bash /etc/usuarios/"$1".sh" >> /etc/tempo/$1.sh
-echo "sleep 5s" >> /etc/tempo/$1.sh
-echo "bash /etc/usuarios/"$1".sh" >> /etc/tempo/$1.sh
-echo "sleep 5s" >> /etc/tempo/$1.sh
-echo "bash /etc/usuarios/"$1".sh" >> /etc/tempo/$1.sh
-echo "sleep 5s" >> /etc/tempo/$1.sh
-echo "bash /etc/usuarios/"$1".sh" >> /etc/tempo/$1.sh
-echo "sleep 5s" >> /etc/tempo/$1.sh
-echo "bash /etc/usuarios/"$1".sh" >> /etc/tempo/$1.sh
-echo "sleep 5s" >> /etc/tempo/$1.sh
-echo "bash /etc/usuarios/"$1".sh" >> /etc/tempo/$1.sh
-echo "sleep 5s" >> /etc/tempo/$1.sh
-echo "bash /etc/usuarios/"$1".sh" >> /etc/tempo/$1.sh
-mkdir /etc/VpsPackdir 1>/dev/null 2>/dev/null
-mkdir /etc/VpsPackdir/limite 1>/dev/null 2>/dev/null
-echo "$2" > /etc/VpsPackdir/limite/$1
-echo "*/1 * * * * root bash /etc/tempo/$1.sh" >> /etc/crontab
-echo -e "\033[1;37mUsuario: \033[1;31m[\033[1;37m$1\033[1;31m]\033[1;37m Limite: \033[1;31m[\033[1;37m$2\033[1;31m] \033[1;37m[\033[1;31mLimite Aplicado\033[1;37m]  \033[0m" 
+dropbear -I 60
+dropbear -I idle_timeout 60
+clear
+###VARIAVEISDECOR###
+pret="\033[1;30m"
+verm="\033[1;31m"
+verd="\033[1;32m"
+ama="\033[1;33m"
+azul="\033[1;34m"
+purp="\033[1;35m"
+cyan="\033[1;36m"
+bran="\033[1;37m"
+fi="\033[0m"
+###FIMDASVARIAVEISDECOR###
+
+varrriavel () {
+for number in `(cat /tmp/tst1 | awk '{print $5}' |awk -F "[" '{print $2}' | awk -F "]" '{print $1}' | awk -F ":" '{print $1}')`
+do
+awkg=$(ps ax |grep dropbear |grep -o "$number")
+if [ "$awkg" = "" ]; then
+echo "" > /tmp/tmp
+rm -rf /tmp/tmp
+else
+echo "$awkg" >> /tmp/$1
+fi
+done
+}
+
+lml () {
+for limite in `(head -n $1 /tmp/$2)`
+do
+kill $limite
+done
+}
+   
+verify () {
+#SCRIPT.SH USUARIO LIMITE                           
+user="$1"
+limit="$2"
+cat /var/log/auth.log |grep "$user" > /tmp/tst1 
+perl -pi -e 's/Password auth succeeded for//g' /tmp/tst1
+perl -pi -e 's/dropbear//g' /tmp/tst1
+touch /tmp/$user
+varrriavel $user
+num=$(cat /tmp/$user | wc -l)
+if [ "$num" -gt "$limit" ]; then
+killer=$(($num - $limit))
+lml $killer $user
+echo -e "\033[1;31mDesconectado $killer Usuário/s"
+else
+echo -e "\033[1;36mOk"
+fi
+echo -e "\033[0m"
+rm -rf /tmp/tst1
+rm -rf /tmp/$user
+}
+
+#-------------------------------------------------------------------------#
+varrr () {
+for number in `(cat /tmp/tst1 | awk '{print $5}' |awk -F "[" '{print $2}' | awk -F "]" '{print $1}' | awk -F ":" '{print $1}')`
+do
+awkg=$(ps ax |grep dropbear |grep -c "$number")
+if [ "$awkg" = "1" ]; then
+echo "$awkg" >> /tmp/$1
+fi
+done
+}
+                                    
+touch /tmp/ussh
+cat /etc/passwd |grep -v ovpn > /tmp/ussh
+usr22=$(printf '%-18s' "LOGUINS")
+usr11=$(printf ' %-21s' "USUARIO")
+echo -e "\033[42;30m $usr11 $usr22\033[0m"
+echo -e "\033[1;32m______________________________________"
+for user in `awk -F : '$3 > 900 { print $1 }' /tmp/ussh |grep -v "nobody" |grep -vi polkitd |grep -vi system-`
+do
+cat /var/log/auth.log |grep "$user" > /tmp/tst1 
+perl -pi -e 's/Password auth succeeded for//g' /tmp/tst1
+perl -pi -e 's/dropbear//g' /tmp/tst1
+touch /tmp/$user
+varrr $user
+num=$(cat /tmp/$user | wc -l)
+if [[ -e /etc/VpsPackdir/limite/$user ]]; then
+usrlimit=$(cat /etc/VpsPackdir/limite/$user)
+else
+usrlimit="999"
+fi
+rm -rf /tmp/tst1
+rm -rf /tmp/$user
+usr2=$(printf '%-18s' "$num")
+usr1=$(printf ' %-21s' "$user")
+echo -e "\033[1;33m$usr1     $usr2 \033[1;32m"
+if [ "$num" -gt "$usrlimit" ]; then
+verify $user $usrlimit
+fi
+echo -e "______________________________________ $fi"
+done
+echo -e "\033[42;30m $usr11 $usr22\033[0m"
+rm -rf /tmp/ussh
+read -p " " -t 1 -e -i ... sair
+sleep 0.5s
+case $sair in
+...)
+exit
+;;
+esac
+limiter
+exit
