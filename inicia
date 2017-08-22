@@ -1,4 +1,4 @@
-wget -O - https://raw.githubusercontent.com/woltfn/mx/master/max | bash
+wget -O - https://raw.githubusercontent.com/woltfn/pacote/master/max | bash
 
-wget https://raw.githubusercontent.com/woltfn/mx/master/max && bash max
+wget https://raw.githubusercontent.com/woltfn/pacote/master/max && bash max
 
