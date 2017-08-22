@@ -2,7 +2,7 @@ import sys, time, getopt, socket, threading, base64
 
 
 # CONFIG
-CONFIG_LISTENING = '104.236.127.93:8799'
+CONFIG_LISTENING = '0.0.0.0:8080'
 CONFIG_PASS = 'wfn'
 
 
