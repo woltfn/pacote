@@ -105,5 +105,5 @@ case $sair in
 exit
 ;;
 esac
-limiter
+limit
 exit
