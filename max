@@ -241,95 +241,95 @@ mkdir /etc/VpsPackdir/limite 2>/dev/null
 mkdir /etc/VpsPackdir/senha 2>/dev/null
 
 rm -rf /usr/bin/limit 2>/dev/null
-wget --no-check-certificate -O /usr/bin/limit "https://github.com/woltfn/mx/raw/master/limit"
+wget --no-check-certificate -O /usr/bin/limit "https://github.com/woltfn/pacote/raw/master/limit"
 chmod +x /usr/bin/limit
 
 rm -rf /usr/bin/cadastro 2>/dev/null
-wget --no-check-certificate -O /usr/bin/cadastro "https://github.com/woltfn/mx/raw/master/cadastro"
+wget --no-check-certificate -O /usr/bin/cadastro "https://github.com/woltfn/pacote/raw/master/cadastro"
 chmod +x /usr/bin/cadastro
 
 rm -rf /usr/bin/redefine 2>/dev/null
-wget --no-check-certificate -O /usr/bin/redefine https://github.com/woltfn/mx/raw/master/redefine 
+wget --no-check-certificate -O /usr/bin/redefine https://github.com/woltfn/pacote/raw/master/redefine 
 chmod +x /usr/bin/redefine
 
 rm -rf /usr/bin/userlogin 2>/dev/null
-wget -o /dev/null -O- https://github.com/woltfn/mx/raw/master/userlogin> /usr/bin/userlogin
+wget -o /dev/null -O- https://github.com/woltfn/pacote/raw/master/userlogin> /usr/bin/userlogin
 chmod +x /usr/bin/userlogin
 
 rm -rf /usr/bin/speedtest.py 2>/dev/null
-wget --no-check-certificate -O /usr/bin/speedtest.py https://raw.githubusercontent.com/RicKbrL/VpsPack/master/speedtest.py  
+wget --no-check-certificate -O /usr/bin/speedtest.py hhttps://github.com/woltfn/pacote/master/raw/speedtest.py  
 chmod +x /usr/bin/speedtest.py
 
 rm -rf /usr/bin/bench-network 2>/dev/null
-wget --no-check-certificate -O /usr/bin/bench-network https://raw.githubusercontent.com/woltfn/mx/master/bench-network  
+wget --no-check-certificate -O /usr/bin/bench-network https://github.com/woltfn/pacote/master/bench-network  
 chmod +x /usr/bin/bench-network
 
 rm -rf /usr/bin/ps_mem.py 2>/dev/null
-wget --no-check-certificate -O /usr/bin/ps_mem.py https://github.com/woltfn/mx/raw/master/ps_mem.py 
+wget --no-check-certificate -O /usr/bin/ps_mem.py https://github.com/woltfn/pacote/raw/master/ps_mem.py 
 chmod +x /usr/bin/ps_mem.py
 
 rm -rf /usr/bin/dropmon 2>/dev/null
-wget --no-check-certificate -O /usr/bin/dropmon https://github.com/woltfn/mx/raw/master/dropmon 
+wget --no-check-certificate -O /usr/bin/dropmon https://github.com/woltfn/pacote/raw/master/dropmon 
 chmod +x /usr/bin/dropmon
 
 rm -rf /usr/bin/clientesctl 2>/dev/null
-wget --no-check-certificate -O /usr/bin/clientesctl https://github.com/woltfn/mx/raw/master/clientesctl
+wget --no-check-certificate -O /usr/bin/clientesctl https://github.com/woltfn/pacote/raw/master/clientesctl
 chmod +x /usr/bin/clientesctl
 
 rm -rf /usr/bin/expire 2>/dev/null
-wget --no-check-certificate -O /usr/bin/expire https://github.com/woltfn/mx/raw/master/expire 
+wget --no-check-certificate -O /usr/bin/expire https://github.com/woltfn/pacote/raw/master/expire 
 chmod +x /usr/bin/expire
 
 rm -rf /usr/bin/trial 2>/dev/null
-wget --no-check-certificate -O /usr/bin/trial https://github.com/woltfn/mx/raw/master/trial  
+wget --no-check-certificate -O /usr/bin/trial https://github.com/woltfn/pacote/raw/master/trial  
 chmod +x /usr/bin/trial
 
 rm -rf /usr/bin/deleteuser 2>/dev/null
-wget --no-check-certificate -O /usr/bin/deleteuser https://github.com/woltfn/mx/raw/master/deleteuser 
+wget --no-check-certificate -O /usr/bin/deleteuser https://github.com/woltfn/pacote/raw/master/deleteuser 
 chmod +x /usr/bin/deleteuser
 
 rm -rf /usr/bin/menu 2>/dev/null
-wget --no-check-certificate -O /usr/bin/menu https://github.com/woltfn/mx/raw/master/menu 
+wget --no-check-certificate -O /usr/bin/menu https://github.com/woltfn/pacote/raw/master/menu 
 chmod +x /usr/bin/menu
 
 rm -rf /usr/bin/backup-users 2>/dev/null
-wget --no-check-certificate -O /usr/bin/backup-users https://github.com/woltfn/mx/raw/master/backup-users 
+wget --no-check-certificate -O /usr/bin/backup-users https://github.com/woltfn/pacote/raw/master/backup-users 
 chmod +x /usr/bin/backup-users
 
 rm -rf /usr/bin/restusers 2>/dev/null
-wget --no-check-certificate -O /usr/bin/restusers https://github.com/woltfn/mx/raw/master/restusers 
+wget --no-check-certificate -O /usr/bin/restusers https://github.com/woltfn/pacote/raw/master/restusers 
 chmod +x /usr/bin/restusers
 
 rm -rf /usr/bin/speedtest 2>/dev/null
-wget --no-check-certificate -O /usr/bin/speedtest https://github.com/woltfn/mx/raw/master/speedtest 
+wget --no-check-certificate -O /usr/bin/speedtest https://github.com/woltfn/pacote/raw/master/speedtest 
 chmod +x /usr/bin/speedtest
 
 rm -rf /usr/bin/host 2>/dev/null
-wget --no-check-certificate -O /usr/bin/host https://github.com/woltfn/mx/raw/master/host 
+wget --no-check-certificate -O /usr/bin/host https://github.com/woltfn/pacote/raw/master/host 
 chmod +x /usr/bin/host
 
 rm -rf /usr/bin/monitorar 2>/dev/null
-wget --no-check-certificate -O /usr/bin/monitorar https://github.com/woltfn/mx/raw/master/monitorar 
+wget --no-check-certificate -O /usr/bin/monitorar https://github.com/woltfn/pacote/raw/master/monitorar 
 chmod +x /usr/bin/monitorar
 
 rm -rf /usr/bin/sshmon 2>/dev/null
-wget --no-check-certificate -O /usr/bin/sshmon https://github.com/woltfn/mx/raw/master/sshmon  
+wget --no-check-certificate -O /usr/bin/sshmon https://github.com/woltfn/pacote/raw/master/sshmon  
 chmod +x /usr/bin/sshmon
 
 rm -rf /usr/bin/screeftech-dev 2>/dev/null
-wget --no-check-certificate -O /usr/bin/screeftech-dev https://github.com/woltfn/mx/raw/master/screeftech-dev 
+wget --no-check-certificate -O /usr/bin/screeftech-dev https://github.com/woltfn/pacote/raw/master/screeftech-dev 
 chmod +x /usr/bin/screeftech-dev
 
 rm -rf /usr/bin/detalhesuser 2>/dev/null
-wget --no-check-certificate -O /usr/bin/detalhesuser https://github.com/woltfn/mx/raw/master/detalhesuser
+wget --no-check-certificate -O /usr/bin/detalhesuser https://github.com/woltfn/pacote/raw/master/detalhesuser
 chmod +x /usr/bin/detalhesuser
 
 rm -rf /usr/bin/opv 2>/dev/null
-wget --no-check-certificate -O /usr/bin/opv  https://github.com/woltfn/mx/raw/master/opv 
+wget --no-check-certificate -O /usr/bin/opv  https://github.com/woltfn/pacote/raw/master/opv 
 chmod +x /usr/bin/opv 
 
 rm -rf /usr/bin/banner 2>/dev/null
-wget --no-check-certificate -O /usr/bin/banner https://github.com/woltfn/mx/raw/master/banner
+wget --no-check-certificate -O /usr/bin/banner https://github.com/woltfn/pacote/raw/master/banner
 chmod +x /usr/bin/banner
 
 echo "@reboot root /usr/bin/ clientesctl
