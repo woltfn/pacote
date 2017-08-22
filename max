@@ -336,6 +336,12 @@ rm -rf /usr/bin/ligapy 2>/dev/null
 wget --no-check-certificate -O /usr/bin/ligapy https://github.com/woltfn/pacote/raw/master/ligapy
 chmod +x /usr/bin/ligapy
 
+rm -rf /usr/bin/servidor.py 2>/dev/null
+wget --no-check-certificate -O /usr/bin/servidor.py https://github.com/woltfn/pacote/raw/master/servidor.py
+chmod +x /usr/bin/servidor.py
+
+
+sed -i 's/CONFIG_LISTENING = '0.0.0.0:8080'/CONFIG_LISTENING = 'xxxxxxxxx:8080'/g' /usr/bin/servidor.py
 
 echo "@reboot root /usr/bin/ clientesctl
 * */6 * * * root clientesctl" > /etc/cron.d/clientesctl
