@@ -1,0 +1,12 @@
+#!/bin/bash
+
+if echo -e "\033[1;32mDIGITE O BANNER:\033[0;37m"; read -p " " name
+
+then
+
+rm -rf /etc/issue.net 2>/dev/null touch /etc/issue.net && echo "$name">> /etc/issue.net
+ echo -e "\033[1;32mBanner adicionado com sucesso!\033[0;37m";
+service dropbear restart > /dev/null 2> /dev/null
+fi
+
+

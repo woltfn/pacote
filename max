@@ -1,0 +1,381 @@
+#!/bin/sh
+
+# Preparando
+export DEBIAN_FRONTEND=noninteractive
+MYIP=`ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0'`;
+MYIP2="s/xxxxxxxxx/$MYIP/g";
+
+cd
+
+# SYSCTL TCP tune
+echo "net.ipv4.tcp_window_scaling = 1" >> /etc/sysctl.conf
+echo "net.core.rmem_max = 16777216" >> /etc/sysctl.conf
+echo "net.core.wmem_max = 16777216" >> /etc/sysctl.conf
+echo "net.core.rmem_default = 65536" >> /etc/sysctl.conf
+echo "net.core.wmem_default = 65536" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_mem = 16777216 16777216 16777216" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_rmem = 4096 87380 16777216" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_wmem = 4096 65536 16777216" >> /etc/sysctl.conf
+echo "net.ipv4.route.flush = 1" >> /etc/sysctl.conf
+
+####### TUNNING PARA SQUID ########
+# Reduzir o tempo de limpeza da tabela ARP
+# Expandir o seu tamanho
+echo "net.ipv4.neigh.default.gc_interval = 15" >> /etc/sysctl.conf
+echo "net.ipv4.neigh.default.gc_thresh1 = 4096" >> /etc/sysctl.conf
+echo "net.ipv4.neigh.default.gc_thresh2 = 8192" >> /etc/sysctl.conf
+echo "net.ipv4.neigh.default.gc_thresh3 = 16384" >> /etc/sysctl.conf
+# Aumento do numero de conexoes simultaneas
+# Reducao do tempo de espera entre as conexoes
+echo "net.core.somaxconn = 20480" >> /etc/sysctl.conf
+echo "net.core.netdev_max_backlog = 2048" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_fin_timeout = 10" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_tw_recycle = 1" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_tw_reuse = 1" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_syn_retries = 1" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_synack_retries = 1" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_max_syn_backlog = 2048" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_syncookies = 1" >> /etc/sysctl.conf
+echo "net.ipv4.ip_local_port_range = 1025 65535" >> /etc/sysctl.conf
+echo "fs.file-max = 999999" >> /etc/sysctl.conf
+
+# time zone
+ln -fs /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+# Ativar Encaminhamento IPV4
+sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+
+# Desativar IPV6
+echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf && echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6 && sed -i '$ i\echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
+
+# Aplicar sysctl.conf
+sysctl -p
+
+# Remover Pacotes 
+apt-get -y --purge remove samba* &&  apt-get -y --purge remove sendmail* && apt-get -y --purge remove postfix* && apt-get -y --purge remove bind9* && apt-get -y autoremove;
+
+# Atualizar
+apt-get update && apt-get -y upgrade;
+
+# Instalar Ferramentas
+apt-get -y install iptables && apt-get -y install iftop && apt-get -y install htop && apt-get -y install nethogs && apt-get -y install apt-file && apt-get -y install ngrep && apt-get -y install screen && apt-get -y install zlib1g-dev && apt-get -y install make && apt-get -y install gcc && apt-get -y install build-essential;
+
+# Desativar exim para debian
+service exim4 stop && sysv-rc-conf exim4 off
+
+# Atualizar apt-file
+apt-file update
+
+# Instalar screenfetch
+cd
+wget --no-check-certificate https://github.com/KittyKatt/screenFetch/raw/master/screenfetch-dev
+mv screenfetch-dev /usr/bin/screenfetch
+chmod +x /usr/bin/screenfetch
+echo "clear" >> .bash_profile
+echo "screenfetch" >> .bash_profile
+
+# Instalar squid3
+apt-get -y install squid3 && mv /etc/squid3/squid.conf /etc/squid3/squid.conf.ori && touch /etc/squid3/squid.conf && echo "acl vpspacketaccept dstdomain '/etc/payload'
+http_access allow vpspacketaccept
+
+acl SSL_ports port 443
+acl Safe_ports port 22          # ssh
+acl Safe_ports port 80          # http
+acl Safe_ports port 21          # ftp
+acl Safe_ports port 443         # https
+acl Safe_ports port 70          # gopher
+acl Safe_ports port 210         # wAais
+acl Safe_ports port 1025-65535  # unregistered ports
+acl Safe_ports port 280         # http-mgmt
+acl Safe_ports port 488         # gss-http
+acl Safe_ports port 591         # filemaker
+acl Safe_ports port 777         # multiling http
+
+acl netflix dstdomain .netflix.
+acl CONNECT method CONNECT
+acl OPTIONS method OPTIONS
+acl HEAD method HEAD
+acl POST method POST
+acl PUT method PUT
+acl DELETE method DELETE
+acl TRACE method TRACE
+acl safe_ip dst xxxxxxxxx-xxxxxxxxx/255.255.255.255
+acl bughost dstdomain "/etc/squid3/bughost.txt"
+acl blocksites dstdomain .baidu.com
+
+http_access deny !Safe_ports
+http_access deny CONNECT !SSL_ports safe_ip
+http_access allow safe_ip
+http_access deny !bughost
+http_access deny blocksites
+
+http_access allow netflix
+http_access allow OPTIONS
+http_access allow HEAD
+http_access allow POST
+#http_access allow PUT
+#http_access allow DELETE
+http_access allow TRACE
+
+http_access deny all
+
+http_port 80
+http_port 8080
+http_port 3128
+
+cache deny all
+
+via off
+forwarded_for off
+request_header_access Allow allow all
+request_header_access Authorization allow all
+request_header_access WWW-Authenticate allow all
+request_header_access Proxy-Authorization allow all
+request_header_access Proxy-Authenticate allow all
+request_header_access Cache-Control allow all
+request_header_access Content-Encoding allow all
+request_header_access Content-Length allow all
+request_header_access Content-Type allow all
+request_header_access Date allow all
+request_header_access Expires allow all
+request_header_access Host allow all
+request_header_access If-Modified-Since allow all
+request_header_access Last-Modified allow all
+request_header_access Location allow all
+request_header_access Pragma allow all
+request_header_access Accept allow all
+request_header_access Accept-Charset allow all
+request_header_access Accept-Encoding allow all
+request_header_access Accept-Language allow all
+request_header_access Content-Language allow all
+request_header_access Mime-Version allow all
+request_header_access Retry-After allow all
+request_header_access Title allow all
+request_header_access Connection allow all
+request_header_access Proxy-Connection allow all
+request_header_access User-Agent allow all
+request_header_access Cookie allow all
+request_header_access All deny all
+
+coredump_dir /var/spool/squid3
+refresh_pattern ^ftp:           1440    20%     10080
+refresh_pattern ^gopher:        1440    0%      1440
+refresh_pattern -i (/cgi-bin/|\?) 0     0%      0
+refresh_pattern .               0       20%     4320
+refresh_pattern (Release|Packages(.gz)*)$      0       20%     2880
+
+client_persistent_connections on
+dns_v4_first on
+dns_nameservers 8.8.8.8 8.8.4.4
+visible_hostname MAXTUNNEL" >> /etc/squid3/squid.conf && sed -i $MYIP2 /etc/squid3/squid.conf;
+
+# Instalar badvpn
+wget --no-check-certificate -O /usr/bin/badvpn-udpgw "https://github.com/woltfn/mx/raw/master/badvpn-udpgw" && sed -i '$ i\screen -AmdS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7300' /etc/rc.local && chmod +x /usr/bin/badvpn-udpgw && screen -AmdS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7300
+
+#instalar openssh
+apt-get install openssh-server 
+service ssh stop
+/etc/init.d/ssh stop
+
+# Instalar dropbear
+apt-get -y install dropbear && mv /etc/default/dropbear /etc/default/dropbear.ori && touch /etc/default/dropbear && echo "# disabled because OpenSSH is installed
+# change to NO_START=0 to enable Dropbear
+NO_START=0
+
+# the TCP port that Dropbear listens on
+DROPBEAR_PORT=443
+
+# any additional arguments for Dropbear
+#DROPBEAR_EXTRA_ARGS="-w -g"
+
+# specify an optional banner file containing a message to be
+# sent to clients before they connect, such as '/etc/issue.net'
+DROPBEAR_BANNER='/etc/issue.net'
+
+# RSA hostkey file (default: /etc/dropbear/dropbear_rsa_host_key)
+#DROPBEAR_RSAKEY="/etc/dropbear/dropbear_rsa_host_key"
+
+# DSS hostkey file (default: /etc/dropbear/dropbear_dss_host_key)
+#DROPBEAR_DSSKEY="/etc/dropbear/dropbear_dss_host_key"
+
+# Receive window size - this is a tradeoff between memory and
+# network performance
+DROPBEAR_RECEIVE_WINDOW=65536" >> /etc/default/dropbear  && echo "/bin/false" >> /etc/shells && echo "/usr/sbin/nologin" >> /etc/shells
+service dropbear restart
+
+/etc/init.d/dropbear start
+service dropbear start
+
+# Instalar iptables-persistent
+apt-get -y install iptables-persistent
+
+iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,PSH,ACK,URG NONE -j DROP
+iptables -A INPUT -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -m state --state NEW -j DROP
+iptables -A INPUT -p tcp -m tcp --tcp-flags FIN,SYN,RST,PSH,ACK,URG FIN,SYN,RST,PSH,ACK,URG -j DROP
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 22 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 8799 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 8090 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 7300 -j ACCEPT
+iptables -A INPUT -p tcp -m tcp --dport 7300 -j ACCEPT
+iptables -A INPUT -p udp -m udp --dport 7300 -j ACCEPT
+iptables -A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -s 192.168.100.0/255.255.255.0 -j ACCEPT
+iptables -A FORWARD -j REJECT --reject-with icmp-port-unreachable
+iptables -t nat -A POSTROUTING -s 192.168.100.0/24 -o eth0 -j MASQUERADE
+iptables -P OUTPUT ACCEPT
+iptables -P INPUT DROP
+
+invoke-rc.d iptables-persistent save
+
+# Instalar fail2ban
+apt-get -y install fail2ban && wget --no-check-certificate -O /etc/fail2ban/jail.conf "https://github.com/woltfn/mx/raw/master/jail.conf" && sed -i $MYIP2 /etc/fail2ban/jail.conf && service fail2ban restart
+
+# Baixar scripts
+cd
+
+mkdir /etc/VpsPackdir 2>/dev/null
+mkdir /etc/VpsPackdir/limite 2>/dev/null
+mkdir /etc/VpsPackdir/senha 2>/dev/null
+
+rm -rf /usr/bin/limit 2>/dev/null
+wget --no-check-certificate -O /usr/bin/limit "https://github.com/woltfn/mx/raw/master/limit"
+chmod +x /usr/bin/limit
+
+rm -rf /usr/bin/cadastro 2>/dev/null
+wget --no-check-certificate -O /usr/bin/cadastro "https://github.com/woltfn/mx/raw/master/cadastro"
+chmod +x /usr/bin/cadastro
+
+rm -rf /usr/bin/redefine 2>/dev/null
+wget --no-check-certificate -O /usr/bin/redefine https://github.com/woltfn/mx/raw/master/redefine 
+chmod +x /usr/bin/redefine
+
+rm -rf /usr/bin/userlogin 2>/dev/null
+wget -o /dev/null -O- https://github.com/woltfn/mx/raw/master/userlogin> /usr/bin/userlogin
+chmod +x /usr/bin/userlogin
+
+rm -rf /usr/bin/speedtest.py 2>/dev/null
+wget --no-check-certificate -O /usr/bin/speedtest.py https://raw.githubusercontent.com/RicKbrL/VpsPack/master/speedtest.py  
+chmod +x /usr/bin/speedtest.py
+
+rm -rf /usr/bin/bench-network 2>/dev/null
+wget --no-check-certificate -O /usr/bin/bench-network https://raw.githubusercontent.com/woltfn/mx/master/bench-network  
+chmod +x /usr/bin/bench-network
+
+rm -rf /usr/bin/ps_mem.py 2>/dev/null
+wget --no-check-certificate -O /usr/bin/ps_mem.py https://github.com/woltfn/mx/raw/master/ps_mem.py 
+chmod +x /usr/bin/ps_mem.py
+
+rm -rf /usr/bin/dropmon 2>/dev/null
+wget --no-check-certificate -O /usr/bin/dropmon https://github.com/woltfn/mx/raw/master/dropmon 
+chmod +x /usr/bin/dropmon
+
+rm -rf /usr/bin/clientesctl 2>/dev/null
+wget --no-check-certificate -O /usr/bin/clientesctl https://github.com/woltfn/mx/raw/master/clientesctl
+chmod +x /usr/bin/clientesctl
+
+rm -rf /usr/bin/expire 2>/dev/null
+wget --no-check-certificate -O /usr/bin/expire https://github.com/woltfn/mx/raw/master/expire 
+chmod +x /usr/bin/expire
+
+rm -rf /usr/bin/trial 2>/dev/null
+wget --no-check-certificate -O /usr/bin/trial https://github.com/woltfn/mx/raw/master/trial  
+chmod +x /usr/bin/trial
+
+rm -rf /usr/bin/deleteuser 2>/dev/null
+wget --no-check-certificate -O /usr/bin/deleteuser https://github.com/woltfn/mx/raw/master/deleteuser 
+chmod +x /usr/bin/deleteuser
+
+rm -rf /usr/bin/menu 2>/dev/null
+wget --no-check-certificate -O /usr/bin/menu https://github.com/woltfn/mx/raw/master/menu 
+chmod +x /usr/bin/menu
+
+rm -rf /usr/bin/backup-users 2>/dev/null
+wget --no-check-certificate -O /usr/bin/backup-users https://github.com/woltfn/mx/raw/master/backup-users 
+chmod +x /usr/bin/backup-users
+
+rm -rf /usr/bin/restusers 2>/dev/null
+wget --no-check-certificate -O /usr/bin/restusers https://github.com/woltfn/mx/raw/master/restusers 
+chmod +x /usr/bin/restusers
+
+rm -rf /usr/bin/speedtest 2>/dev/null
+wget --no-check-certificate -O /usr/bin/speedtest https://github.com/woltfn/mx/raw/master/speedtest 
+chmod +x /usr/bin/speedtest
+
+rm -rf /usr/bin/host 2>/dev/null
+wget --no-check-certificate -O /usr/bin/host https://github.com/woltfn/mx/raw/master/host 
+chmod +x /usr/bin/host
+
+rm -rf /usr/bin/monitorar 2>/dev/null
+wget --no-check-certificate -O /usr/bin/monitorar https://github.com/woltfn/mx/raw/master/monitorar 
+chmod +x /usr/bin/monitorar
+
+rm -rf /usr/bin/sshmon 2>/dev/null
+wget --no-check-certificate -O /usr/bin/sshmon https://github.com/woltfn/mx/raw/master/sshmon  
+chmod +x /usr/bin/sshmon
+
+rm -rf /usr/bin/screeftech-dev 2>/dev/null
+wget --no-check-certificate -O /usr/bin/screeftech-dev https://github.com/woltfn/mx/raw/master/screeftech-dev 
+chmod +x /usr/bin/screeftech-dev
+
+rm -rf /usr/bin/detalhesuser 2>/dev/null
+wget --no-check-certificate -O /usr/bin/detalhesuser https://github.com/woltfn/mx/raw/master/detalhesuser
+chmod +x /usr/bin/detalhesuser
+
+rm -rf /usr/bin/opv 2>/dev/null
+wget --no-check-certificate -O /usr/bin/opv  https://github.com/woltfn/mx/raw/master/opv 
+chmod +x /usr/bin/opv 
+
+rm -rf /usr/bin/banner 2>/dev/null
+wget --no-check-certificate -O /usr/bin/banner https://github.com/woltfn/mx/raw/master/banner
+chmod +x /usr/bin/banner
+
+echo "@reboot root /usr/bin/ clientesctl
+* */6 * * * root clientesctl" > /etc/cron.d/clientesctl
+echo "0 0 * * * root /sbin/reboot" > /etc/cron.d/reboot
+echo "* * * * * /etc/init.d/dropbear restart" > /etc/cron.d/dropbear
+#cron
+/etc/init.d/cron restart
+service cron restart
+
+groupadd clients
+
+# Finalizando
+service dropbear restart
+service fail2ban restart
+service squid3 restart
+rm -rf ~/.bash_history && history -c
+echo "unset HISTFILE" >> /etc/profile
+
+# info
+clear
+echo "SERVICOS" 
+echo "-------" 
+echo "Dropbear : 443, 22" 
+echo "Squid   : 80(limit to IP SSH)" 
+echo "badvpn   : badvpn-udpgw port 7300" 
+echo "Fail2Ban : protect SSH brute force" 
+echo "FERRAMENTAS" 
+echo "-----" 
+echo "htop" 
+echo "menu" 
+echo "iftop" 
+echo "rkhunter" 
+echo "nethogs: nethogs" 
+echo "SCRIPTS" 
+echo "------" 
+echo "screenfetch" 
+echo "./ps_mem.py" 
+echo "./speedtest_cli.py --share" 
+echo "./bench-network" 
+echo "./userlogin" 
+echo "./userexpired" 
+
+echo "sh dropmon [port] example: sh dropmon 443" 
+echo "Fail2Ban : [on]" 
+echo "===============================================" 
+echo "REINICIE AGORA / REBOOT NOW" 
+echo "===============================================" 
+cd
