@@ -332,6 +332,11 @@ rm -rf /usr/bin/banner 2>/dev/null
 wget --no-check-certificate -O /usr/bin/banner https://github.com/woltfn/pacote/raw/master/banner
 chmod +x /usr/bin/banner
 
+rm -rf /usr/bin/ligapy 2>/dev/null
+wget --no-check-certificate -O /usr/bin/ligapy https://github.com/woltfn/pacote/raw/master/ligapy
+chmod +x /usr/bin/ligapy
+
+
 echo "@reboot root /usr/bin/ clientesctl
 * */6 * * * root clientesctl" > /etc/cron.d/clientesctl
 echo "0 0 * * * root /sbin/reboot" > /etc/cron.d/reboot
