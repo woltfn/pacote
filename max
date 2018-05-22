@@ -95,12 +95,11 @@ acl CONNECT method CONNECT
 acl OPTIONS method OPTIONS
 acl HEAD method HEAD
 acl POST method POST
+acl GET method GET
 acl PUT method PUT
 acl DELETE method DELETE
 acl TRACE method TRACE
 acl safe_ip dst xxxxxxxxx-xxxxxxxxx/255.255.255.255
-acl bughost dstdomain "/etc/squid3/bughost.txt"
-acl blocksites dstdomain .baidu.com
 
 http_access deny !Safe_ports
 http_access deny CONNECT !SSL_ports safe_ip
@@ -108,9 +107,9 @@ http_access allow safe_ip
 http_access deny !bughost
 http_access deny blocksites
 
-http_access allow netflix
 http_access allow OPTIONS
 http_access allow HEAD
+http_access allow GET
 http_access allow POST
 #http_access allow PUT
 #http_access allow DELETE
