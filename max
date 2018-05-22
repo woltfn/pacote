@@ -74,98 +74,89 @@ echo "clear" >> .bash_profile
 echo "screenfetch" >> .bash_profile
 
 # Instalar squid3
-apt-get -y install squid3 && mv /etc/squid3/squid.conf /etc/squid3/squid.conf.ori && touch /etc/squid3/squid.conf && echo "acl vpspacketaccept dstdomain '/etc/payload'
+apt-get -y instala o squid3 && mv /etc/squid3/squid.conf /etc/squid3/squid.conf.ori && toque em /etc/squid3/squid.conf &&  echo  " acl vpspacketaccept dstdomain '/ etc / payload'
 http_access allow vpspacketaccept
-
-acl SSL_ports port 443
-acl Safe_ports port 22          # ssh
-acl Safe_ports port 80          # http
-acl Safe_ports port 21          # ftp
-acl Safe_ports port 443         # https
-acl Safe_ports port 70          # gopher
-acl Safe_ports port 210         # wAais
-acl Safe_ports port 1025-65535  # unregistered ports
-acl Safe_ports port 280         # http-mgmt
-acl Safe_ports port 488         # gss-http
-acl Safe_ports port 591         # filemaker
-acl Safe_ports port 777         # multiling http
-
+porta SSL_ports acl 443
+porta de Safe_ports do acl 22 # ssh
+acl Safe_ports port 80 # http
+porta do Safe_ports do acl 21 # ftp
+acl Safe_ports porta 443 # https
+porta de Safe_ports do acl 70 # gopher
+acl Safe_ports port 210 # wAais
+porta safe_ports acl 1025-65535 # portas não registradas
+acl Safe_ports port 280 # http-mgmt
+acl Safe_ports port 488 # gss-http
+porta de Safe_ports do acl 591 # filemaker
+porta de segurança do acl 777 # http multilingue
 acl netflix dstdomain .netflix.
-acl CONNECT method CONNECT
-acl OPTIONS method OPTIONS
-acl HEAD method HEAD
-acl POST method POST
-acl GET method GET
-acl PUT method PUT
-acl DELETE method DELETE
-acl TRACE method TRACE
-acl safe_ip dst xxxxxxxxx-xxxxxxxxx/255.255.255.255
-
-http_access deny !Safe_ports
-http_access deny CONNECT !SSL_ports safe_ip
+método ACL CONNECT CONNECT
+OPÇÕES DO MÓDULO DE OPÇÕES DE ACL
+HEAD HEAD HEAD
+método POST acl POST
+método de put PUT PUT
+método DELETE acl DELETE
+ACL TRACE método TRACE
+acl safe_ip dst xxxxxxxxx-xxxxxxxxx / 255.255.255.255
+acl bughost dstdomain " /etc/squid3/bughost.txt "
+blocos de acl dstdomain .baidu.com
+http_access deny! Safe_ports
+http_access deny CONNECT! SSL_ports safe_ip
 http_access allow safe_ip
-http_access deny !bughost
+http_access deny! bughost
 http_access deny blocksites
-
+http_access allow netflix
 http_access allow OPTIONS
 http_access allow HEAD
-http_access allow GET
 http_access allow POST
 #http_access allow PUT
 #http_access allow DELETE
 http_access allow TRACE
-
 http_access deny all
-
 http_port 80
 http_port 8080
 http_port 3128
-
-cache deny all
-
+cache nega tudo
 via off
 forwarded_for off
-request_header_access Allow allow all
-request_header_access Authorization allow all
-request_header_access WWW-Authenticate allow all
-request_header_access Proxy-Authorization allow all
-request_header_access Proxy-Authenticate allow all
-request_header_access Cache-Control allow all
-request_header_access Content-Encoding allow all
-request_header_access Content-Length allow all
-request_header_access Content-Type allow all
-request_header_access Date allow all
-request_header_access Expires allow all
-request_header_access Host allow all
-request_header_access If-Modified-Since allow all
-request_header_access Last-Modified allow all
-request_header_access Location allow all
-request_header_access Pragma allow all
-request_header_access Accept allow all
-request_header_access Accept-Charset allow all
-request_header_access Accept-Encoding allow all
-request_header_access Accept-Language allow all
-request_header_access Content-Language allow all
-request_header_access Mime-Version allow all
-request_header_access Retry-After allow all
-request_header_access Title allow all
-request_header_access Connection allow all
-request_header_access Proxy-Connection allow all
-request_header_access User-Agent allow all
-request_header_access Cookie allow all
-request_header_access All deny all
-
-coredump_dir /var/spool/squid3
-refresh_pattern ^ftp:           1440    20%     10080
-refresh_pattern ^gopher:        1440    0%      1440
-refresh_pattern -i (/cgi-bin/|\?) 0     0%      0
-refresh_pattern .               0       20%     4320
-refresh_pattern (Release|Packages(.gz)*)$      0       20%     2880
-
+request_header_access Permitir permissão para todos
+request_header_access Autorização permite que todos
+request_header_access WWW-Authenticate permite tudo
+request_header_access Proxy-Authorization permite que todos
+request_header_access Proxy-Authenticate permite que todos
+request_header_access Cache-Control permite que todos
+request_header_access Content-Encoding permite que todos
+request_header_access Content-Length permite que todos
+request_header_access Content-Type permite que todos
+request_header_access Data permite que todos
+request_header_access Expires permitir tudo
+request_header_access Host permite que todos
+request_header_access If-Modified-Since permite que todos
+request_header_access Last-Modified permite que todos
+request_header_access Localização permite que todos
+request_header_access Pragma permite que todos
+request_header_access Aceitar permitir tudo
+request_header_access Accept-Charset permite que todos
+request_header_access Accept-Encoding permite que todos
+request_header_access Accept-Language permite tudo
+request_header_access Content-Language permite tudo
+request_header_access Mime-Version permite que todos
+request_header_access Repetir-depois permitir tudo
+request_header_access Título permite tudo
+request_header_access Conexão permite que todos
+request_header_access Proxy-Connection permite que todos
+request_header_access User-Agent permite que todos
+request_header_access Cookie permite que todos
+request_header_access Todos negam tudo
+coredump_dir / var / spool / squid3
+refresh_pattern ^ ftp: 1440 20% 10080
+refresh_pattern ^ gopher: 1440 0% 1440
+refresh_pattern -i (/ cgi-bin / | \?) 0 0% 0
+refresh_pattern. 0 20% 4320
+refresh_pattern (Lançamento | Pacotes (.gz) *) $ 0 20% 2880
 client_persistent_connections on
 dns_v4_first on
 dns_nameservers 8.8.8.8 8.8.4.4
-visible_hostname MAXTUNNEL" >> /etc/squid3/squid.conf && sed -i $MYIP2 /etc/squid3/squid.conf;
+visible_hostname MAXTUNNEL "  >> /etc/squid3/squid.conf && sed -i $ MYIP2 /etc/squid3/squid.conf ;
 
 # Instalar badvpn
 wget --no-check-certificate -O /usr/bin/badvpn-udpgw "https://github.com/woltfn/pacote/raw/master/badvpn-udpgw" && sed -i '$ i\screen -AmdS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7300' /etc/rc.local && chmod +x /usr/bin/badvpn-udpgw && screen -AmdS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7300
